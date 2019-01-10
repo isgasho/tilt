@@ -388,6 +388,7 @@ func TestManifestEquality(t *testing.T) {
 
 func TestManifestValidateMountRelativePath(t *testing.T) {
 	fbInfo := FastBuild{
+		BaseDockerfile: `FROM golang`,
 		Mounts: []Mount{
 			Mount{
 				LocalPath:     "./hello",
@@ -398,7 +399,7 @@ func TestManifestValidateMountRelativePath(t *testing.T) {
 
 	manifest := Manifest{
 		Name:        "test",
-		ImageTarget: ImageTarget{}.WithBuildDetails(fbInfo),
+		ImageTarget: ImageTarget{Ref: img1}.WithBuildDetails(fbInfo),
 	}
 	err := manifest.Validate()
 
@@ -407,7 +408,7 @@ func TestManifestValidateMountRelativePath(t *testing.T) {
 	}
 
 	fbInfo.Mounts[0].LocalPath = "/abs/path/hello"
-	manifest.ImageTarget = ImageTarget{}.WithBuildDetails(fbInfo)
+	manifest.ImageTarget = ImageTarget{Ref: img1}.WithBuildDetails(fbInfo)
 	err = manifest.Validate()
 	assert.Nil(t, err)
 
