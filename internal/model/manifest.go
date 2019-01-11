@@ -22,10 +22,11 @@ func (m ManifestName) TargetName() TargetName { return TargetName(m) }
 // NOTE: If you modify Manifest, make sure to modify `Manifest.Equal` appropriately
 type Manifest struct {
 	// Properties for all manifests.
-	Name          ManifestName
-	tiltFilename  string
-	dockerignores []Dockerignore
-	repos         []LocalGitRepo
+	Name                    ManifestName
+	tiltFilename            string
+	dockerignores           []Dockerignore
+	repos                   []LocalGitRepo
+	ignoredLocalDirectories []string
 
 	// Info needed to Docker build an image. (This struct contains details of StaticBuild, FastBuild... etc.)
 	// (If we ever support multiple build engines, this can become an interface wildcard similar to `deployTarget`).
@@ -102,6 +103,11 @@ func (m Manifest) WithRepos(repos []LocalGitRepo) Manifest {
 	return m
 }
 
+func (m Manifest) WithIgnoredLocalDirectories(dirs []string) Manifest {
+	m.ignoredLocalDirectories = dirs
+	return m
+}
+
 func (m Manifest) WithDockerignores(dockerignores []Dockerignore) Manifest {
 	m.dockerignores = append(append([]Dockerignore{}, m.dockerignores...), dockerignores...)
 	return m
@@ -134,6 +140,10 @@ func (m Manifest) LocalPaths() []string {
 			return nil
 		}
 	}
+}
+
+func (m Manifest) IgnoredLocalDirectories() []string {
+	return m.ignoredLocalDirectories
 }
 
 func (m Manifest) Validate() error {
